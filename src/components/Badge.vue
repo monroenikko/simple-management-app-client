@@ -1,0 +1,16 @@
+<script setup>
+defineProps({
+  label: {
+    type: String,
+    required: true,
+  },
+});
+</script>
+
+<template>
+  <span
+    class="inline-block bg-blue-100 text-blue-800 text font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-900"
+  >
+    {{ label }}
+  </span>
+</template>
