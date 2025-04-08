@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAuthStore } from './authStore';
+import { useAlertStore } from './alertStore';
 
 export const useTasksStore = defineStore('tasksStore', {
   state: () => {
@@ -52,6 +53,8 @@ export const useTasksStore = defineStore('tasksStore', {
     },
 
     async createTask(data) {
+      const alertStore = useAlertStore();
+
       const formData = new FormData();
 
       formData.append('title', data.title);
@@ -77,17 +80,20 @@ export const useTasksStore = defineStore('tasksStore', {
       if (dataRes.errors) {
         this.errors = dataRes.errors;
       } else {
+        alertStore.showAlert({
+          message: dataRes.message,
+          type: 'success',
+          visible: true,
+          duration: 5000,
+        });
         this.router.push({ name: 'home' });
         this.errors = {};
       }
     },
-    showSuccessNotification(message) {
-      this.notificationMessage = message;
-      this.notificationType = 'success';
-      this.notificationVisible = true;
-    },
+
     async markTaskStatus(task, formData) {
       const authStore = useAuthStore();
+      const alertStore = useAlertStore();
       if (authStore.user.id === task.user_id) {
         const res = await fetch(`/api/tasks/${task.id}/mark-status`, {
           method: 'PATCH',
@@ -102,9 +108,13 @@ export const useTasksStore = defineStore('tasksStore', {
         if (data.errors) {
           this.errors = data.errors;
         } else {
-          console.log(data.message);
+          alertStore.showAlert({
+            message: data.message,
+            type: 'success',
+            visible: true,
+            duration: 5000,
+          });
 
-          this.showSuccessNotification(data.message);
           this.getAllTasks();
           this.router.push({ name: 'home' });
           this.errors = {};
@@ -114,6 +124,7 @@ export const useTasksStore = defineStore('tasksStore', {
 
     async deleteTask(post) {
       const authStore = useAuthStore();
+      const alertStore = useAlertStore();
       if (authStore.user.id === post.user_id) {
         const res = await fetch(`/api/tasks/${post.id}`, {
           method: 'delete',
@@ -124,6 +135,12 @@ export const useTasksStore = defineStore('tasksStore', {
 
         const data = await res.json();
         if (res.ok) {
+          alertStore.showAlert({
+            message: data.message,
+            type: 'success',
+            visible: true,
+            duration: 5000,
+          });
           this.router.push({ name: 'home' });
         }
       }
@@ -131,6 +148,7 @@ export const useTasksStore = defineStore('tasksStore', {
 
     async updateTask(task, data) {
       const authStore = useAuthStore();
+      const alertStore = useAlertStore();
       if (authStore.user.id === task.user_id) {
         try {
           const formData = new FormData();
@@ -165,6 +183,12 @@ export const useTasksStore = defineStore('tasksStore', {
 
             return false;
           } else {
+            alertStore.showAlert({
+              message: dataRes.message,
+              type: 'success',
+              visible: true,
+              duration: 5000,
+            });
             this.router.push({ name: 'home' });
             this.errors = {};
             return true;
@@ -173,6 +197,13 @@ export const useTasksStore = defineStore('tasksStore', {
           this.errors = {
             general: ['An unexpected error occurred. Please try again.'],
           };
+
+          alertStore.showAlert({
+            message: 'An unexpected error occurred. Please try again.',
+            type: 'error',
+            visible: true,
+            duration: 5000,
+          });
           return false;
         }
       }

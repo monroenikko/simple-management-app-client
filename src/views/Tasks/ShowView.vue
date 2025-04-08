@@ -22,7 +22,7 @@ onMounted(async () => (task.value = await getTask(route.params.id)));
         <div class="w-full h-full pt-10">
           <div class="bg-white shadow-md rounded-xl overflow-hidden">
             <div class="p-4">
-              <Badge :label="task.status.name" />
+              <Badge :label="task.status.name" :color="task.status.color" />
               <h2 class="text-xl font-semibold mb-2 mt-2">
                 TITLE: {{ task.title }}
               </h2>

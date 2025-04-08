@@ -8,10 +8,12 @@ import Pagination from '@/components/Pagination.vue';
 import SelectComponent from '@/components/Select.vue';
 import Badge from '@/components/Badge.vue';
 import AlertNotification from '@/components/AlertNotif.vue';
+import { useAlertStore } from '@/stores/alertStore';
 
 const statusStore = useStatusStore();
 const { errors } = storeToRefs(useTasksStore());
 const taskStore = useTasksStore();
+const alertStore = useAlertStore();
 onMounted(() => (errors.value = {}));
 
 const statusId = ref('');
@@ -106,11 +108,11 @@ onMounted(async () => {
     <h1 class="title">Manage Tasks</h1>
 
     <AlertNotification
-      v-if="taskStore.notificationVisible"
-      :message="taskStore.notificationMessage"
-      :type="taskStore.notificationType"
-      :duration="5000"
-      @close="taskStore.notificationVisible = false"
+      v-if="alertStore.alertVisible"
+      :message="alertStore.alertMessage"
+      :type="alertStore.alertType"
+      :duration="alertStore.alertDuration"
+      @close="alertStore.alertVisible = false"
     />
 
     <div class="w-full p-2">
@@ -196,7 +198,7 @@ onMounted(async () => {
         <div class="bg-white shadow-md rounded-xl overflow-hidden">
           <div class="p-4">
             <div class="text-end">
-              <Badge :label="data.status.name" />
+              <Badge :label="data.status.name" :color="data.status.color" />
             </div>
 
             <div class="py-3">

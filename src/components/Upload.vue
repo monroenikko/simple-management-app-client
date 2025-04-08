@@ -18,6 +18,8 @@ const files = ref([...props.modelValue]);
 
 const API_URL = ref(import.meta.env.VITE_BASE_URL);
 
+const triggerChange = ref(false);
+
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -31,10 +33,12 @@ const fileInput = ref(null);
 const handleFileChange = (event) => {
   const selectedFiles = event.target.files;
   if (selectedFiles) {
+    triggerChange.value = true;
     Array.from(selectedFiles).forEach((file) => {
       const fileUrl = URL.createObjectURL(file);
       files.value.push({ file, url: fileUrl });
     });
+
     emit('update:modelValue', [...files.value]);
   }
 };
@@ -88,7 +92,13 @@ const triggerFileInput = () => {
     >
       <div v-for="(file, index) in files" :key="index" class="relative">
         <img
-          :src="action === 'create' ? file.url : API_URL + file.url"
+          :src="
+            action === 'create'
+              ? file.url
+              : triggerChange === true
+              ? file.url
+              : API_URL + file.url
+          "
           alt="Uploaded Image"
           class="w-full h-32 object-cover rounded-md"
         />
